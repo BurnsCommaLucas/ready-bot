@@ -1,5 +1,5 @@
 const DISCORD = require("discord.js");
-const CLIENT = new DISCORD.client();
+const CLIENT = new DISCORD.Client();
 const PREFIX = "!";
 const CHECK_READY_CMD = "cready";
 const CHECK_NUM_CMD = "?";
