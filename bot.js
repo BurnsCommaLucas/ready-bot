@@ -39,7 +39,7 @@ CLIENT.on("message", (m) => {
 				check = args[0];
 				ready = [];
 				checker = auth;
-				chan.send("@everyone ready up! Type " + PREFIX + READY_CMD + " Waiting for " + check + " player" + (check != 1 ? "s" : "") + ".");
+				chan.send("@everyone ready up! Type `" + PREFIX + READY_CMD + "`. Waiting for " + check + " player" + (check != 1 ? "s" : "") + ".");
 			}
 		}
 		if (command == READY_CMD) {
