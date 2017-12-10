@@ -31,7 +31,7 @@ client.on("message", (m) => {
 					noRCAck(chan, "How many players do you want to wait for?");
 				}
 				else {
-					noRCAck(chan, "What? You can't have \"" + args[0] + "\" player" + (check != 1 ? "s" : "") + " to check.");
+					noRCAck(chan, "What? You can't have \"" + args[0] + "\" player" + (args[0] != 1 ? "s" : "") + " to check.");
 				}
 			}
 			else {
