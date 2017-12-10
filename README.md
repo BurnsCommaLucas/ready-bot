@@ -24,7 +24,7 @@ To see how many players still need to ready, use
 ```
 Ready checks can be overridden by another instance of the first command, and checks will only be performed if the number entered is greater than 0. The person who initiates the ready check may also respond to the check as ready.
 
-If you experience any unusual behavior from the bot, or think of a feature that could be added, please open an issue ticket. 
+If you experience any unusual behavior from the bot or think of a feature that could be added, please open an issue ticket. 
 
 ---
 ## Planned Improvements
