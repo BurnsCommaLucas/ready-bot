@@ -73,4 +73,4 @@ function noRCAck (chan, reason) {
 	"``` to check how many players still need to ready.");
 }
 
-client.login("Mzg5MjEwNjQwNjEyNTg5NTY4.DQ4TPw.vlSsoyWy9NN_m4i9Y_HRLp2OBxw");
+client.login(process.env.BOT_TOKEN);
