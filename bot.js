@@ -1,20 +1,21 @@
-const Discord = require("discord.js");
-const client = new Discord.Client();
-const prefix = "!";
+const DISCORD = require("discord.js");
+const CLIENT = new DISCORD.client();
+const PREFIX = "!";
 const CHECK_READY_CMD = "cready";
 const CHECK_NUM_CMD = "?";
 const READY_CMD = "ready";
-const USAGE = prefix + CHECK_READY_CMD;
-var check;
+const USAGE = PREFIX + CHECK_READY_CMD;
+
+var check = false;
 var ready = [];
 var checker = "";
 
-client.on("message", (m) => {
+CLIENT.on("message", (m) => {
 	var cont = m.content;
 	var chan = m.channel;
 	var auth = m.author;
-	if (cont.startsWith(prefix)) {
-		const args = cont.slice(prefix.length).trim().split(/ +/g);
+	if (cont.startsWith(PREFIX)) {
+		const args = cont.slice(PREFIX.length).trim().split(/ +/g);
 		const command = args.shift().toLowerCase();
 		if (command == CHECK_READY_CMD) {
 			if (args[0] == CHECK_NUM_CMD) {
@@ -31,14 +32,14 @@ client.on("message", (m) => {
 					noRCAck(chan, "How many players do you want to wait for?");
 				}
 				else {
-					noRCAck(chan, "What? You can't have \"" + args[0] + "\" player" + (args[0] != 1 ? "s" : "") + " to check.");
+					noRCAck(chan, "What? You can't have \"" + args[0] + "\" player" + (args[0] != "one" ? "s" : "") + " to check.");
 				}
 			}
 			else {
 				check = args[0];
+				ready = [];
 				checker = auth;
-				var numLeft = (check - ready.length);
-				chan.send("@everyone ready up! Waiting for " + check + " player" + (numLeft != 1 ? "s" : "") + ".");
+				chan.send("@everyone ready up! Type " + PREFIX + READY_CMD + " Waiting for " + check + " player" + (check != 1 ? "s" : "") + ".");
 			}
 		}
 		if (command == READY_CMD) {
@@ -73,4 +74,4 @@ function noRCAck (chan, reason) {
 	"``` to check how many players still need to ready.");
 }
 
-client.login(process.env.BOT_TOKEN);
+CLIENT.login(process.env.BOT_TOKEN);
