@@ -1,10 +1,10 @@
 # ready-bot
 
-[//]: [![Heroku](https://heroku-badge.herokuapp.com/?app=ready-bot&style=flat&svg=1)](https://github.com/pussinboots/heroku-badge)
+![Travis CI build status](https://travis-ci.org/BurnsCommaLucas/ready-bot.svg?branch=master)
 
-A WoW style ready-check handler bot for [Discord](https://discordapp.com) servers. Built and deployed automatically through [Heroku](https://dashboard.heroku.com). 
+A WoW style ready-check bot for [Discord](https://discordapp.com) servers. Built and deployed automatically through [Heroku](https://dashboard.heroku.com). 
 
-To get this bot on your server, [use this link](https://discordapp.com/oauth2/authorize?client_id=389210640612589568&scope=bot) and add the bot to the server you want. (You need to have server management  permissions to add the bot.)
+[Click here to add this bot to your server.](https://discordapp.com/oauth2/authorize?client_id=389210640612589568&scope=bot) (You need to have server management  permissions to add the bot.)
 
 
 ## Usage
