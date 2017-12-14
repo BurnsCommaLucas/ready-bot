@@ -2,5 +2,4 @@ language: node_js
 node_js:
   - "lts/*"
 install:
-  - bundle install --path vendor/bundle
-  - npm install
+  - npm install discord.js
