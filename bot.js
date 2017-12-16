@@ -4,6 +4,9 @@ const PREFIX = "!";
 const CHECK_READY_CMD = "cready";
 const CHECK_NUM_CMD = "?";
 const READY_CMD = "ready";
+const UNREADY_CMD = "unready";
+const HELP_CMD = "help";
+const EVERY = "@everyone";
 const USAGE = PREFIX + CHECK_READY_CMD;
 
 var check = false;
@@ -24,15 +27,15 @@ CLIENT.on("message", (m) => {
 					chan.send("Still waiting for " + numLeft + " player" + (numLeft != 1 ? "s" : "") + " to ready.");
 				}
 				else {
-					noRCAck(chan, "No ready check active.");
+					errorMsg(chan, "No ready check active.");
 				}
 			}
 			else if (isNaN(args[0]) || args[0] <= 0) {
 				if (typeof args[0] == 'undefined') {
-					noRCAck(chan, "How many players do you want to wait for?");
+					errorMsg(chan, "How many players do you want to wait for?");
 				}
 				else {
-					noRCAck(chan, "What? You can't have \"" + args[0] + "\" player" + (args[0] != "one" ? "s" : "") + " to check.");
+					errorMsg(chan, "What? You can't have \"" + args[0] + "\" player" + (args[0] != "one" ? "s" : "") + " to check.");
 				}
 			}
 			else {
@@ -43,35 +46,57 @@ CLIENT.on("message", (m) => {
 			}
 		}
 		if (command == READY_CMD) {
-			if (check) {
-				if (ready.indexOf(auth) == -1) {
-					ready.push(auth);
-					var numLeft = (check - ready.length);
-					chan.send(auth + " is ready! " + numLeft + " player" + (numLeft != 1 ? "s" : "") + " left.");
-					if (check == ready.length) {
-						check = false;
-						ready = [];
-						chan.send("Ready check complete, " + checker + ". Lets go!");
+			if (args[0] == HELP_CMD) {
+				helpMsg(chan);
+			}
+			else {
+				if (check) {
+					if (ready.indexOf(auth) == -1) {
+						ready.push(auth);
+						var numLeft = (check - ready.length);
+						chan.send(auth + " is ready! " + numLeft + " player" + (numLeft != 1 ? "s" : "") + " left.");
+						if (check == ready.length) {
+							check = false;
+							ready = [];
+							chan.send("Ready check complete, " + checker + ". Lets go!");
+						}
+					}
+					else {
+						chan.send("You've already readied!");
 					}
 				}
 				else {
-					chan.send("You've already readied!");
+					errorMsg(chan, "No ready check active.");
+				}
+			}
+		}
+		if (command == UNREADY_CMD) {
+			if (check) {
+				var index = ready.indexOf(auth);
+				if (index == -1) {
+					chan.send("You haven't readied yet, no need to unready!");
+				}
+				else {
+					ready.splice(index, 1);
+					var numLeft = (check - ready.length);
+					chan.send(auth + " is not ready! " + numLeft + " player" + (numLeft != 1 ? "s" : "") + " left.");
 				}
 			}
 			else {
-				noRCAck(chan, "No ready check active.");
+				errorMsg(chan, "No ready check active.");
 			}
-		}
-		if (command == "help") {
-			chan
 		}
 	}
 });
 
-function noRCAck (chan, reason) {
-	chan.send((typeof reason == 'undefined' ? "" : reason + " ") + "Type ```" + USAGE + 
-	" <number>``` to start a ready check, and ```" + USAGE + " " + CHECK_NUM_CMD + 
-	"``` to check how many players still need to ready.");
+function errorMsg (chan, reason) {
+	chan.send((typeof reason == 'undefined' ? "" : reason + " ") + "Type ```" + PREFIX + READY_CMD + " " + HELP_CMD + "``` for a list of commands.");
+}
+
+function helpMsg (chan) {
+	chan.send("To start a ready check:```" + PREFIX + CHECK_READY_CMD + " <number>" +
+	"```To ready-up:```" + PREFIX + READY_CMD + "```" +
+	"```To see how many people need to ready-up:```" + PREFIX + CHECK_READY_CMD + CHECK_NUM_CMD);
 }
 
 CLIENT.login(process.env.BOT_TOKEN);
