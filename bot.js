@@ -96,7 +96,7 @@ function errorMsg (chan, reason) {
 function helpMsg (chan) {
 	chan.send("To start a ready check:```" + PREFIX + CHECK_READY_CMD + " <number>" +
 	"```To ready-up:```" + PREFIX + READY_CMD +
-	"```To see how many people need to ready-up:```" + PREFIX + CHECK_READY_CMD + CHECK_NUM_CMD + "```");
+	"```To see how many people need to ready-up:```" + PREFIX + CHECK_READY_CMD + " " + CHECK_NUM_CMD + "```");
 }
 
 CLIENT.login(process.env.BOT_TOKEN);
