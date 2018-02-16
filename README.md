@@ -1,6 +1,6 @@
 # ready-bot
 
-![Travis CI build status](https://travis-ci.org/BurnsCommaLucas/ready-bot.svg?branch=master)
+<a href="https://travis-ci.org/BurnsCommaLucas/ready-bot" target="_blank" src="https://travis-ci.org/BurnsCommaLucas/ready-bot.svg?branch=master"></a>
 
 A WoW style ready-check bot for [Discord](https://discordapp.com) servers. Built and deployed automatically through [Heroku](https://heroku.com), with constant integration testing through [Travis CI](https://travis-ci.org).
 
@@ -28,8 +28,9 @@ If you experience any unusual behavior from the bot or think of a feature that c
 
 ## Planned Improvements
 
-- Option to disable @everyone mention on check initiation
-- Option to disable mention for ready-checker upon completion of check
-- Option to @everyone upon completion of check
-- Option to remove members as ready-check candidates
-- Option to specify members as ready-check candidates
+- Disable @everyone mention on check initiation
+- Disable mention for ready-checker upon completion of check
+- @everyone upon completion of check
+- @ only the people involved in the check
+- Remove members as ready-check candidates
+- Specify members as ready-check candidates
