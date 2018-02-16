@@ -1,60 +1,58 @@
 const DISCORD = require("discord.js");
 const CLIENT = new DISCORD.Client();
-const PREFIX = "!";
-const CHECK_READY_CMD = "cready";
-const CHECK_NUM_CMD = "?";
-const READY_CMD = "ready";
-const UNREADY_CMD = "unready";
-const HELP_CMD = "help";
-const EVERY = "@everyone";
-const USAGE = PREFIX + CHECK_READY_CMD;
+
+const util = require('./utilities.js');
+const con = require('./constants.js');
 
 var check = false;
 var ready = [];
 var checker = "";
 
 CLIENT.on("message", (m) => {
-	var cont = m.content;
-	var chan = m.channel;
-	var auth = m.author;
-	if (cont.startsWith(PREFIX)) {
-		const args = cont.slice(PREFIX.length).trim().split(/ +/g);
-		const command = args.shift().toLowerCase();
-		if (command == CHECK_READY_CMD) {
-			if (args[0] == CHECK_NUM_CMD) {
+	const cont = m.content;
+	const chan = m.channel;
+	const auth = m.author;
+	if (!cont.startsWith(con.PREFIX)) {
+		return;
+	}
+	const args = cont.slice(con.PREFIX.length).trim().split(/ +/g);
+	const command = args.shift().toLowerCase();
+	switch (command) {
+		case (con.CHECK_con.READY_CMD):
+			if (args[0] == con.CHECK_NUM_CMD) {
 				if (check) {
 					var numLeft = (check - ready.length);
-					chan.send("Still waiting for " + numLeft + " player" + (numLeft != 1 ? "s" : "") + " to ready.");
+					chan.send("Still waiting for " + numLeft + " player" + util.plural(numLeft) + " to ready.");
 				}
 				else {
-					errorMsg(chan, "No ready check active.");
+					util.errorMsg(chan, "No ready check active.");
 				}
 			}
 			else if (isNaN(args[0]) || args[0] <= 0) {
 				if (typeof args[0] == 'undefined') {
-					errorMsg(chan, "How many players do you want to wait for?");
+					util.errorMsg(chan, "How many players do you want to wait for?");
 				}
 				else {
-					errorMsg(chan, "What? You can't have \"" + args[0] + "\" player" + (args[0] != "one" ? "s" : "") + " to check.");
+					util.errorMsg(chan, "What? You can't have \"" + args[0] + "\" player" + util.plural(args[0]) + " to check.");
 				}
 			}
 			else {
 				check = args[0];
 				ready = [];
 				checker = auth;
-				chan.send("@everyone ready up! Type `" + PREFIX + READY_CMD + "`. Waiting for " + check + " player" + (check != 1 ? "s" : "") + ".");
+				chan.send("@everyone ready up! Type `" + con.PREFIX + con.READY_CMD + "`. Waiting for " + check + " player" + util.plural(check) + ".");
 			}
-		}
-		if (command == READY_CMD) {
-			if (args[0] == HELP_CMD) {
-				helpMsg(chan);
+		break;
+		case (con.READY_CMD):
+			if (args[0] == con.HELP_CMD) {
+				util.helpMsg(chan);
 			}
 			else {
 				if (check) {
 					if (ready.indexOf(auth) == -1) {
 						ready.push(auth);
 						var numLeft = (check - ready.length);
-						chan.send(auth + " is ready! " + numLeft + " player" + (numLeft != 1 ? "s" : "") + " left.");
+						chan.send(auth + " is ready! " + numLeft + " player" + util.plural(numLeft) + " left.");
 						if (check == ready.length) {
 							check = false;
 							ready = [];
@@ -66,11 +64,11 @@ CLIENT.on("message", (m) => {
 					}
 				}
 				else {
-					errorMsg(chan, "No ready check active.");
+					util.errorMsg(chan, "No ready check active.");
 				}
 			}
-		}
-		if (command == UNREADY_CMD) {
+		break;
+		case (con.UNREADY_CMD):
 			if (check) {
 				var index = ready.indexOf(auth);
 				if (index == -1) {
@@ -79,24 +77,16 @@ CLIENT.on("message", (m) => {
 				else {
 					ready.splice(index, 1);
 					var numLeft = (check - ready.length);
-					chan.send(auth + " is not ready! " + numLeft + " player" + (numLeft != 1 ? "s" : "") + " left.");
+					chan.send(auth + " is not ready! " + numLeft + " player" + util.plural(numLeft) + " left.");
 				}
 			}
 			else {
-				errorMsg(chan, "No ready check active.");
+				util.errorMsg(chan, "No ready check active.");
 			}
-		}
+		break;
+		default:
+		break;
 	}
 });
-
-function errorMsg (chan, reason) {
-	chan.send((typeof reason == 'undefined' ? "" : reason + " ") + "Type ```" + PREFIX + READY_CMD + " " + HELP_CMD + "``` for a list of commands.");
-}
-
-function helpMsg (chan) {
-	chan.send("To start a ready check:```" + PREFIX + CHECK_READY_CMD + " <number>" +
-	"```To ready-up:```" + PREFIX + READY_CMD +
-	"```To see how many people need to ready-up:```" + PREFIX + CHECK_READY_CMD + " " + CHECK_NUM_CMD + "```");
-}
 
 CLIENT.login(process.env.BOT_TOKEN);
