@@ -18,7 +18,7 @@ CLIENT.on("message", (m) => {
 	const args = cont.slice(con.PREFIX.length).trim().split(/ +/g);
 	const command = args.shift().toLowerCase();
 	switch (command) {
-		case (con.CHECK_con.READY_CMD):
+		case (con.CHECK_READY_CMD):
 			if (args[0] == con.CHECK_NUM_CMD) {
 				if (check) {
 					var numLeft = (check - ready.length);
