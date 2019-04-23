@@ -9,6 +9,7 @@ var ready = [];
 var checker = "";
 
 CLIENT.on("message", (m) => {
+        console.log("Bot currently on " + CLIENT.guilds.size + " servers");
 	const cont = m.content;
 	const chan = m.channel;
 	const auth = m.author;
