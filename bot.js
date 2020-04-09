@@ -101,9 +101,10 @@ CLIENT.on('ready', () => {
 // Hook up to discord
 CLIENT.login(process.env.BOT_TOKEN);
 
-// Every hour, update top.gg bot server count
+// Every hour, update top.gg bot server count and log server count
 CLIENT.on('ready', () => {
     setInterval(() => {
-        DBL_API.postStats(CLIENT.guilds.size, CLIENT.shards.Id, CLIENT.shards.total);
-    }, 1800000);
+		console.log("Server count = " + CLIENT.guilds.size);
+        DBL_API.postStats(CLIENT.guilds.size);
+    }, 60000);
 });
