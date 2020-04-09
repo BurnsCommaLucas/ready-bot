@@ -1,5 +1,9 @@
 const DISCORD = require("discord.js");
+const DBL = require("dblapi.js");
+require('dotenv').config()
+
 const CLIENT = new DISCORD.Client();
+const DBL_API = new DBL(process.env.DBL_TOKEN)
 
 const util = require('./utilities.js');
 const con = require('./constants.js');
@@ -9,7 +13,6 @@ var ready = [];
 var checker = "";
 
 CLIENT.on("message", (m) => {
-        console.log("Bot currently on " + CLIENT.guilds.size + " servers");
 	const cont = m.content;
 	const chan = m.channel;
 	const auth = m.author;
@@ -41,7 +44,7 @@ CLIENT.on("message", (m) => {
 				check = args[0];
 				ready = [];
 				checker = auth;
-				chan.send("@everyone ready up! Type `" + con.PREFIX + con.READY_CMD + "`. Waiting for " + check + " player" + util.plural(check) + ".");
+				chan.send(con.EVERY + " ready up! Type `" + con.PREFIX + con.READY_CMD + "`. Waiting for " + check + " player" + util.plural(check) + ".");
 			}
 		break;
 		case (con.READY_CMD):
@@ -90,4 +93,17 @@ CLIENT.on("message", (m) => {
 	}
 });
 
+// Give some diagnostic info when we log in
+CLIENT.on('ready', () => {
+	console.log(`Logged in as ${CLIENT.user.tag}!`);
+});
+
+// Hook up to discord
 CLIENT.login(process.env.BOT_TOKEN);
+
+// Every hour, update top.gg bot server count
+CLIENT.on('ready', () => {
+    setInterval(() => {
+        DBL_API.postStats(CLIENT.guilds.size, CLIENT.shards.Id, CLIENT.shards.total);
+    }, 1800000);
+});
