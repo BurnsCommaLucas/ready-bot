@@ -2,14 +2,18 @@
   "name": "ready-bot",
   "description": "ready-bot",
   "version": "0.0.0",
-  "main": "bot.js",
+  "main": "startup.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/burnscommalucas/ready-bot.git"
+  },
   "scripts": {
-    "start": "node bot.js"
+    "start": "node --experimental-modules startup.js"
   },
   "dependencies": {
+    "@discordjs/uws": "^10.149.0",
     "dblapi.js": "^2.4.0",
     "discord.js": "^11.4.2",
-    "dotenv": "^8.2.0",
-    "request": "latest"
+    "dotenv": "^8.2.0"
   }
 }
