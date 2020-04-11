@@ -20,7 +20,7 @@ module.exports = {
 		const command = args.shift().toLowerCase();
 		switch (command) {
 			case (CON.CHECK_READY_CMD):
-				checkHelper.call(checks, channel, user, args);
+				this.checkHelper.call(checks, channel, user, args);
 				break;
 			case (CON.READY_CMD):
 				if (args[0] == CON.HELP_CMD) {
