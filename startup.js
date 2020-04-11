@@ -3,6 +3,7 @@ const DBL = require("dblapi.js");
 require("dotenv").config();
 
 const BOT = require("./bot.js");
+const CON = require("./constants.js");
 
 const CLIENT = new DISCORD.Client();
 const DBL_API = new DBL(process.env.DBL_TOKEN);
