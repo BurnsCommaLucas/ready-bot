@@ -1,7 +1,7 @@
 {
   "name": "ready-bot",
   "description": "ready-bot",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "engines": {
     "node": "^12.16.1",
     "npm": "^6.14.4"

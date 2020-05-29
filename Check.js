@@ -4,13 +4,6 @@ const CON = require("./constants.js");
 const UTIL = require("./utilities.js");
 
 class Check {
-	channel;
-	author;
-	targets;
-	count;
-	isTargeted;
-	readiedUsers;
-	readiedCount;
 	/**
 	 * @param {DISCORD.Channel} channel The channel this check is associated with
 	 * @param {DISCORD.User} author The user who initiated the check
@@ -45,7 +38,7 @@ class Check {
 	/**
 	 * @returns {boolean} True if readiness count OR target list has been fulfilled
 	 */
-	isCheckComplete() {
+	isCheckSatisfied() {
 		return this.readiedCount == this.count;
 	}
 

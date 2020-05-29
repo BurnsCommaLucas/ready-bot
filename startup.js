@@ -8,16 +8,20 @@ const CON = require("./constants.js");
 const CLIENT = new DISCORD.Client();
 const DBL_API = new DBL(process.env.DBL_TOKEN);
 
+const checks = {};
+
 CLIENT.on("message", (m) => {
 	const content = m.content;
-	const channel = m.channel;
-	const user = m.author;
-
+	
 	// Check if we should even be looking at the bot
 	if (!content.startsWith(CON.PREFIX)) {
 		return;
 	}
-	BOT.handleMessage(content, channel, user);
+
+	const channel = m.channel;
+	const user = m.author;
+
+	BOT.handleMessage(checks, content, channel, user);
 });
 
 CLIENT.on("ready", () => {
