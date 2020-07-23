@@ -8,7 +8,7 @@ A WoW style ready-check bot for [Discord](https://discordapp.com) servers. Built
 
 [Click here to add this bot to your server.](https://discordapp.com/oauth2/authorize?client_id=389210640612589568&scope=bot) (You need to have server management  permissions to add the bot.)
 
-If you like the bot, [vote for it on top.gg!](https://top.gg/bot/389210640612589568) It helps other people find the bot!
+If you like the bot, [vote for it on top.gg!](https://top.gg/bot/389210640612589568) It helps other people find the bot! Want to support development of this bot? Find me on [Ko-Fi @BurnsCommaLucas](https://ko-fi.com/burnscommalucas)
 
 ## Usage
 
@@ -31,9 +31,10 @@ If you experience any unusual behavior from the bot or think of a feature that c
 
 ## Planned Improvements
 
+- Create checks on a per-user-per-channel basis instead of 1 per channel
 - Disable @everyone mention on check initiation
 - Disable mention for ready-checker upon completion of check
 - @everyone upon completion of check
-- @ only the people involved in the check
 - Remove members as ready-check candidates
-- Specify members as ready-check candidates
+- ~~Specify members as ready-check candidates~~
+- ~~@ only the people involved in the check~~
