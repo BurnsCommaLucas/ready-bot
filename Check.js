@@ -4,28 +4,41 @@ const CON = require("./constants.js");
 const UTIL = require("./utilities.js");
 
 class Check {
-	channel;
-	author;
-	targets;
-	count;
-	isTargeted;
-	readiedUsers;
-	readiedCount;
 	/**
-	 * @param {DISCORD.Channel} channel The channel this check is associated with
-	 * @param {DISCORD.User} author The user who initiated the check
-	 * @param {DISCORD.User[]} targets The users who the author wants to have ready-up
-	 * @param {number} count The number of users the author wants to have ready-up
+	 * @param {DISCORD.Channel} _channel The channel this check is associated with
+	 * @param {DISCORD.User} _author The user who initiated the check
 	 */
-	constructor(channel, author, count, targets = []) {
-		this.channel = channel;
-		this.author = author;
-		this.targets = targets;
-		this.count = count;
-		this.isTargeted = targets.length > 0;
+	constructor(_channel, _author) {
+		this.channel = _channel;
+		this.author = _author;
+		this.count = 0;
+		this.targets = [];
 		this.readiedUsers = [];
 		this.readiedCount = 0;
-		channel.send(`${UTIL.whoToReady(targets)} ready up! Type \`${CON.PREFIX}${CON.READY_CMD}\`. ${author} is waiting for ${count} player${UTIL.plural(count)}.`);
+	}
+
+	/**
+	 * @param {number|DISCORD.User} _target how many people/which people to have ready
+	 * @param {string} _targetName what tag to use in chat if not the individual user names
+	 */
+	activate(_target, _targetName) {
+		if (!isNaN(_target)) {
+			this.count = _target;
+			this.isTargeted = false;
+		}
+		else if (_target instanceof Array) {
+			this.targets = _target;
+			this.count = this.targets.length;
+			this.isTargeted = true;
+		}
+		else {
+			console.debug(_target);
+			console.debug(_targetName);
+			return false;
+		}
+		const plural = UTIL.plural(this.count);
+		this.channel.send(`${_targetName || UTIL.whoToReady(this.targets)} ready up! Type \`${CON.PREFIX}${CON.READY_CMD}\`. ${this.author} is waiting for ${this.count} player${plural}.`);
+		return true;
 	}
 
 	/**
@@ -43,10 +56,32 @@ class Check {
 	}
 
 	/**
+	 * @returns {string} A description of who/how many players still need to mark themselves ready
+	 */
+	getRemainderString() {
+		if (this.isTargeted) {
+			return UTIL.whoToReady(UTIL.leftOuter(this.targets, this.readiedUsers));
+		}
+		const count = this.countRemaining();
+		return `${count} player${UTIL.plural(count)}`;
+	}
+
+	/**
 	 * @returns {boolean} True if readiness count OR target list has been fulfilled
 	 */
-	isCheckComplete() {
-		return this.readiedCount == this.count;
+	isCheckSatisfied() {
+		var retVal = true;
+		if (this.isTargeted) {
+			this.targets.forEach( u => {
+				if (!this.isUserReadied(u)) {
+					retVal = false;
+				}
+			});
+		}
+		else {
+			retVal = this.readiedCount == this.count;
+		}
+		return retVal
 	}
 
 	/**
