@@ -27,8 +27,9 @@ CLIENT.on("ready", () => {
 	
 	// Every hour, update top.gg bot server count and log server count
 	setInterval(() => {
-		console.log(`Server count = ${CLIENT.guilds.size}`);
-		DBL_API.postStats(CLIENT.guilds.size);
+		const serverCount = CLIENT.guilds.holds.length;
+		console.log(`Server count = ${serverCount}`);
+		DBL_API.postStats(serverCount);
 	}, 60000);
 });
 
