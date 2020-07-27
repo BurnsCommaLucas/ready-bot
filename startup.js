@@ -26,10 +26,10 @@ CLIENT.on("ready", () => {
 	CLIENT.user.setActivity("Type `!ready help` to get started")
 	
 	// Every hour, update top.gg bot server count and log server count
-	// setInterval(() => {
-	// 	console.log(`Server count = ${CLIENT.guilds.size}`);
-	// 	DBL_API.postStats(CLIENT.guilds.size);
-	// }, 60000);
+	setInterval(() => {
+		console.log(`Server count = ${CLIENT.guilds.size}`);
+		DBL_API.postStats(CLIENT.guilds.size);
+	}, 60000);
 });
 
 // Hook up to discord
