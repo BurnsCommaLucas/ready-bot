@@ -5,12 +5,10 @@ const UTIL = require("./utilities.js");
 
 class Check {
 	/**
-	 * @param {DISCORD.Channel} _channel The channel this check is associated with
-	 * @param {DISCORD.User} _author The user who initiated the check
+	 * @param {DISCORD.CommandInteraction} _interaction The interaction which initiated this check 
 	 */
-	constructor(_channel, _author) {
-		this.channel = _channel;
-		this.author = _author;
+	constructor(_interaction) {
+		this.interaction = _interaction;
 		this.count = 0;
 		this.targets = [];
 		this.readiedUsers = [];
@@ -18,10 +16,9 @@ class Check {
 	}
 
 	/**
-	 * @param {number|DISCORD.User} _target how many people/which people to have ready
-	 * @param {string} _targetName what tag to use in chat if not the individual user names
+	 * @param {number| Array<DISCORD.User>} _target how many people/which people to have ready
 	 */
-	activate(_target, _targetName) {
+	async activate(_target) {
 		if (!isNaN(_target)) {
 			this.count = _target;
 			this.isTargeted = false;
@@ -32,12 +29,14 @@ class Check {
 			this.isTargeted = true;
 		}
 		else {
-			console.debug(_target);
-			console.debug(_targetName);
+			console.error("Falied to determine check type.")
+			console.error(_target);
 			return false;
 		}
 		const plural = UTIL.plural(this.count);
-		this.channel.send(`${_targetName || UTIL.whoToReady(this.targets)} ready up! Type \`${CON.PREFIX}${CON.READY_CMD}\`. ${this.author} is waiting for ${this.count} player${plural}.`);
+		await UTIL.safeReply(this.interaction, {
+			content: `${UTIL.buildMentionString(this.targets)} ready up! Type \`/${CON.READY}\`. \n${this.interaction.user.toString()} is waiting for ${this.count} player${plural}.`
+		});
 		return true;
 	}
 
@@ -52,18 +51,17 @@ class Check {
 	 * @returns {DISCORD.User} The user who created this ready check
 	 */
 	getAuthor() {
-		return this.author;
+		return this.interaction.user;
 	}
 
 	/**
 	 * @returns {string} A description of who/how many players still need to mark themselves ready
 	 */
 	getRemainderString() {
-		if (this.isTargeted) {
-			return UTIL.whoToReady(UTIL.leftOuter(this.targets, this.readiedUsers));
-		}
-		const count = this.countRemaining();
-		return `${count} player${UTIL.plural(count)}`;
+		return this.isTargeted ? UTIL.buildMentionString(UTIL.leftOuter(this.targets, this.readiedUsers)) : (() => {
+			const count = this.countRemaining();
+			return `${count} player${UTIL.plural(count)}`;
+		})();
 	}
 
 	/**
@@ -72,7 +70,7 @@ class Check {
 	isCheckSatisfied() {
 		var retVal = true;
 		if (this.isTargeted) {
-			this.targets.forEach( u => {
+			this.targets.forEach(u => {
 				if (!this.isUserReadied(u)) {
 					retVal = false;
 				}
@@ -102,6 +100,12 @@ class Check {
 		return this.targets.indexOf(user) > -1;
 	}
 
+	baseMessagePreamble() {
+		if (!!this.readiedUsers.length) {
+			return "Nobody is"
+		}
+	}
+
 	/**
 	 * Mark the user ready if appropriate
 	 * @param {DISCORD.User} user User to mark ready
@@ -109,19 +113,26 @@ class Check {
 	readyUser(user) {
 		// If this user has already readied for this check
 		if (this.isUserReadied(user)) {
-			this.channel.send("You've already readied!");
-			return;
+			return {
+				content: "You've already readied!",
+				ephemeral: true
+			};
 		}
 
 		// If check is username based but this user doesn't need to ready for this check
 		if (this.isTargeted && !this.isUserReadyRequired(user)) {
-			this.channel.send("You don't need to ready in this check!");
-			return;
+			return {
+				content: "You don't need to ready in this check!",
+				ephemeral: true
+			};
 		}
 
 		this.readiedUsers.push(user);
 		this.readiedCount = this.readiedUsers.length;
-		this.channel.send(`${user} is ready! ${this.countRemaining()} player${UTIL.plural(this.countRemaining())} left.`);
+		// TODO edit base reply
+		await UTIL.safeReply(this.interaction, {
+			content: `${this.baseMessagePreamble()} ready! ${this.countRemaining()} player${UTIL.plural(this.countRemaining())} left.`
+		});
 	}
 
 	/**
@@ -129,16 +140,16 @@ class Check {
 	 * @param {DISCORD.User} user User to mark ready
 	 */
 	unReadyUser(user) {
-		var msg;
-		if (!this.isUserReadied(user)) {
-			msg = "You haven't readied yet, no need to unready!";
-		}
-		else {
+		return this.isUserReadied(user) ? "You haven't readied yet, no need to unready!" : (() => {
 			this.readiedUsers.splice(this.readiedUsers.indexOf(user), 1);
 			this.readiedCount = this.readiedUsers.length;
+			UTIL.safeReply(this.interaction, {
+				content: ``
+			},
+			true);
 			msg = `${user} is not ready! ${this.countRemaining()} player${UTIL.plural(this.countRemaining())} left.`;
 		}
-		this.channel.send(msg);
+		)();
 	}
 }
 

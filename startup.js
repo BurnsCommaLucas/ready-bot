@@ -3,6 +3,7 @@ const DBL = require("dblapi.js");
 require("dotenv").config();
 
 const BOT = require("./bot.js");
+const CON = require("./constants.js");
 
 const CLIENT = new Client({
 	intents: 2048
@@ -15,7 +16,7 @@ CLIENT.on("ready", () => {
 	// Give some diagnostic info when we log in
 	console.log(`Logged in as ${CLIENT.user.tag}!`);
 
-	CLIENT.user.setActivity("/ready");
+	CLIENT.user.setActivity(`/${CON.HELP}`);
 
 	// Every hour, update top.gg bot server count and log server count
 	// setInterval(() => {
