@@ -23,7 +23,7 @@ CLIENT.on("ready", () => {
 	// Give some diagnostic info when we log in
 	console.log(`Logged in as ${CLIENT.user.tag}!`);
 
-	CLIENT.user.setActivity("!ready help");
+	CLIENT.user.setActivity("Slash commands incoming!\n\n!ready help");
 	
 	// Every hour, update top.gg bot server count and log server count
 	setInterval(() => {
