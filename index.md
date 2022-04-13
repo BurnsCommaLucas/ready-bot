@@ -1,37 +1,52 @@
-## Welcome to GitHub Pages
+# [ready-bot](https://burnscommalucas.github.io/ready-bot/)
+[![Discord Bots](https://top.gg/api/widget/status/389210640612589568.svg)](https://top.gg/bot/389210640612589568)
+[![Discord Bots](https://top.gg/api/widget/servers/389210640612589568.svg)](https://top.gg/bot/389210640612589568)
 
-You can use the [editor on GitHub](https://github.com/BurnsCommaLucas/ready-bot/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
+A WoW style ready-check bot for [Discord](https://discordapp.com) servers. Built and deployed automatically through [Heroku](https://heroku.com).
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+[Click here to add this bot to your server.](https://discordapp.com/oauth2/authorize?client_id=389210640612589568&scope=bot)
 
-### Markdown
+If you like the bot, [vote for it on top.gg!](https://top.gg/bot/389210640612589568) It helps other people find the bot.
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+Want to support development of this bot, ask for a feature, or report a bug? Come to our [homepage](https://burnscommalucas.github.io/ready-bot/) or [GitHub](https://github.com/BurnsCommaLucas/ready-bot).
 
-```markdown
-Syntax highlighted code block
+---
 
-# Header 1
-## Header 2
-### Header 3
+## Planned Improvements
+To meet Discord's changing privacy guidelines, ready-bot will move soon from using `!` commands to `/` commands! This will let us offer better integration with Discord as well as keeping your message data totally private. 
 
-- Bulleted
-- List
+For current users, here's what will change when `/` commands are added:
 
-1. Numbered
-2. List
+| Action                    | Current Command | Upcoming "Slash Command" |
+| ------------------------- | --------------- | ------------------------ |
+| Create a check            | `!cready`       | `/check`                 |
+| See who is not ready      | `!cready ?`     | `/who`                   |
+| Mark yourself "ready"     | `!ready`        | `/ready`                 |
+| Mark yourself "not ready" | `!unready`      | `/unready`               |
+| See usage instructions    | `!ready help`   | `/help`                  |
+| Get a link to the GitHub  | `!contribute`   | `/docs`                  |
 
-**Bold** and _Italic_ and `Code` text
+---
 
-[Link](url) and ![Image](src)
+## Usage
+
+Once you add the bot to your server, start a ready check for a number of players with:
+
 ```
+!cready <number>
+```
+or check for specific players with
+```
+!cready <user tag> <user tag> ...
+```
+and have players ready-up with 
+```
+!ready
+```
+Full usage can be found by typing 
+```
+!ready help
+```
+Ready checks can be overridden by another instance of the first command, and checks will only be performed if the number entered is greater than 0. The person who initiates the ready check may also respond to the check as ready.
 
-For more details see [Basic writing and formatting syntax](https://docs.github.com/en/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/BurnsCommaLucas/ready-bot/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+If you experience any unusual behavior from the bot or think of a feature that could be added, please open an issue ticket.
