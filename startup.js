@@ -3,6 +3,7 @@ const DBL = require("dblapi.js");
 require("dotenv").config();
 
 const BOT = require("./bot.js");
+const CON = require("./constants.js");
 
 const CLIENT = new Client({
 	intents: 2048

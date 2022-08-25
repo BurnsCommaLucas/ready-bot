@@ -11,13 +11,12 @@ module.exports = {
 	 */
 	async handleMessage(checks, interaction) {
 		var fn;
-		const channelId = interaction.channelId;
 		const author = interaction.user;
 
 		const newCheck = new Check(channelId, author);
 
 		// Get the current check for the current channel if one exists
-		const currentCheck = checks[channelId];
+		const currentCheck = checks[interaction.channelId];
 
 		switch (interaction.commandName) {
 			case (CON.HELP):
@@ -28,13 +27,13 @@ module.exports = {
 						`If you still need help, you can come check out our Github page. Type \`/${CON.CONTRIBUTE}\``,
 					ephemeral: true
 				});
-				break;
+				return;
 			case (CON.CONTRIBUTE):
 				await UTIL.safeRespond(interaction, {
 					content: "To get involved in the development of ready-bot or to report an issue, visit our [Github](https://github.com/BurnsCommaLucas/ready-bot)",
 					ephemeral: true
 				});
-				break;
+				return;
 			case (CON.READY):
 				fn = Check.prototype.readyUser;
 			case (CON.UNREADY):
@@ -43,7 +42,7 @@ module.exports = {
 						content: UTIL.errorMsg("No ready check active in this channel."),
 						ephemeral: true
 					});
-					break;
+					return;
 				}
 
 				// Get the right ready/unready function and call it
@@ -56,7 +55,7 @@ module.exports = {
 						content: `Ready-check complete, ${Check.prototype.getAuthor.call(currentCheck)}, let's go!`
 					});
 				}
-				break;
+				return;
 			case (CON.STATUS):
 				if (currentCheck) {
 					await UTIL.safeRespond(interaction, {
@@ -70,7 +69,7 @@ module.exports = {
 						ephemeral: true
 					});
 				}
-				break;
+				return;
 			case (CON.CHECK.CREATE):
 				if (interaction.options.data.length <= 0) {
 					await UTIL.safeRespond(interaction, {

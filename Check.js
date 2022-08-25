@@ -45,7 +45,7 @@ class Check {
 	 * @returns {DISCORD.User} The user who created this ready check
 	 */
 	getAuthor() {
-		return this.author;
+		return this.interaction.user;
 	}
 
 	/**
@@ -93,6 +93,12 @@ class Check {
 	 */
 	isUserReadyRequired(user) {
 		return this.targets.indexOf(user) > -1;
+	}
+
+	baseMessagePreamble() {
+		if (!!this.readiedUsers.length) {
+			return "Nobody is"
+		}
 	}
 
 	/**
