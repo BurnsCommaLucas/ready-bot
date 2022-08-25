@@ -13,10 +13,25 @@ module.exports = {
     },
 
     /**
+    * @param {DISCORD.CommandInteraction} interaction
+    * @param {string | DISCORD.MessagePayload | DISCORD.InteractionReplyOptions} options
+    */
+    safeRespond: async function (interaction, options) {
+        try {
+            if (interaction.replied) return;
+            await interaction.reply(options);
+            return true;
+        } catch (error) {
+            console.warn("Failed to reply to interaction:", interaction, options)
+            console.trace();
+        }
+    },
+
+    /**
      * @param {number} val
      */
-    plural: function (val) {
-        return (val != 1 ? "s" : "");
+    plural: function (val, pluralizer = "s") {
+        return (val != 1 ? pluralizer : "");
     },
 
     /**
@@ -31,10 +46,10 @@ module.exports = {
 
     /**
      * Format the list of who needs to ready up or return the everyone tag
-     * @param {DISCORD.User[]} users 
+     * @param {DISCORD.GuildMember[]} users 
      */
     whoToReady: function (users) {
-        var out = users.join(", ");
-        return out || CON.HERE;
+        var out = users.map(member => member.user).join(", ");
+        return out;
     }
 }

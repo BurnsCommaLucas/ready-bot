@@ -14,20 +14,23 @@ module.exports = {
 		const channelId = interaction.channelId;
 		const author = interaction.user;
 
+		const newCheck = new Check(channelId, author);
+
 		// Get the current check for the current channel if one exists
 		const currentCheck = checks[channelId];
 
 		switch (interaction.commandName) {
 			case (CON.HELP):
-				await interaction.reply({
+				await UTIL.safeRespond(interaction, {
 					content: `To create a check, run \`/${CON.CHECK.CREATE}\`\n` +
 						`To respond to a check, run \`/${CON.READY}\` or \`/${CON.UNREADY}\`\n` +
-						`To see who still needs to ready, run \`/${CON.STATUS}\``,
+						`To see who still needs to ready, run \`/${CON.STATUS}\`\n` +
+						`If you still need help, you can come check out our Github page. Type \`/${CON.CONTRIBUTE}\``,
 					ephemeral: true
 				});
 				break;
 			case (CON.CONTRIBUTE):
-				await interaction.reply({
+				await UTIL.safeRespond(interaction, {
 					content: "To get involved in the development of ready-bot or to report an issue, visit our [Github](https://github.com/BurnsCommaLucas/ready-bot)",
 					ephemeral: true
 				});
@@ -36,7 +39,7 @@ module.exports = {
 				fn = Check.prototype.readyUser;
 			case (CON.UNREADY):
 				if (!currentCheck) {
-					await interaction.reply({
+					await UTIL.safeRespond(interaction, {
 						content: UTIL.errorMsg("No ready check active in this channel."),
 						ephemeral: true
 					});
@@ -45,167 +48,166 @@ module.exports = {
 
 				// Get the right ready/unready function and call it
 				fn = (fn || Check.prototype.unReadyUser);
-				fn.call(currentCheck, author);
+				await fn.call(currentCheck, author, interaction);
 
 				if (Check.prototype.isCheckSatisfied.call(currentCheck)) {
-					delete checks[channel.id];
-					return await interaction.reply({
-						content: `Ready check complete, ${Check.prototype.getAuthor.call(currentCheck)}. Let's go!`
+					delete checks[channelId];
+					interaction.channel.send({
+						content: `Ready-check complete, ${Check.prototype.getAuthor.call(currentCheck)}, let's go!`
 					});
 				}
 				break;
 			case (CON.STATUS):
 				if (currentCheck) {
-					await interaction.reply({
+					await UTIL.safeRespond(interaction, {
 						content: `Still waiting for ${Check.prototype.getRemainderString.call(currentCheck)} to ready.`,
 						ephemeral: true
 					});
 				}
 				else {
-					await interaction.reply({
+					await UTIL.safeRespond(interaction, {
 						content: UTIL.errorMsg("No ready check active in this channel."),
 						ephemeral: true
 					});
 				}
 				break;
 			case (CON.CHECK.CREATE):
-				this.createCheckHandler.call(this, checks, interaction);
+				if (interaction.options.data.length <= 0) {
+					await UTIL.safeRespond(interaction, {
+						content: `You'll need to select either ${CON.CHECK.CREATE_MENTION_TARGET} or ${CON.CHECK.CREATE_NUM_TARGET} to create a check.`,
+						ephemeral: true
+					});
+					return;
+				}
+
+				const checkType = interaction.options.data[0].name;
+				var activeParam;
+				switch (checkType) {
+					case CON.CHECK.CREATE_MENTION_TARGET:
+						activeParam = await this.parseMentionCheckHandler.call(this, interaction)
+						break;
+					case CON.CHECK.CREATE_NUM_TARGET:
+						activeParam = await this.parseNumCheckHandler.call(this, interaction)
+						break;
+					default:
+						await UTIL.safeRespond(interaction, {
+							content: `I don't understand check type '${checkType}'. Please get in touch with my creator to let them know this happened!`,
+							ephemeral: true
+						});
+						return;
+				}
+
+				// If the activeParam is filled out and the activation call succeeds, save the check
+				if (!!activeParam && Check.prototype.activate.call(newCheck, activeParam)) {
+					const plural = UTIL.plural(newCheck.count);
+					await UTIL.safeRespond(interaction, {
+						content: `${UTIL.whoToReady(newCheck.targets) || "Everyone"} ready up! Type \`/${CON.READY}\`. ${author} is waiting for ${newCheck.count} user${plural}.`
+					});
+					checks[channelId] = newCheck;
+				}
+				else {
+					if (interaction.replied) break;
+					await UTIL.safeRespond(interaction, {
+						content: `Sorry, something went wrong and I couldn't create your check.\n` +
+							`Please type \`/${CON.CONTRIBUTE}\` to report this to my maker!`,
+						ephemeral: true
+					});
+					console.error("Failed to create check:", interaction);
+					console.error("target:", activeParam);
+				}
 				break;
 			default:
-				await interaction.reply({
-					content: "uhhhh whoops"
+				await UTIL.safeRespond(interaction, {
+					content: "Yikes! Somehow a command not meant for me made it all the way to my system 😥. Please let my creator know this happened! https://github.com/BurnsCommaLucas/ready-bot",
+					ephemeral: true
 				});
 				break;
 		}
 
 		setTimeout(async () => {
 			if (!interaction.replied) {
-				await interaction.reply({
-					content: "Sorry, something has gone wrong ¯\\_(ツ)_/¯",
+				await UTIL.safeRespond(interaction, {
+					content: "Sorry, something has gone wrong! If this message keeps showing up, please get " +
+						"in touch with my maker since it probably means something bad is happening to my system. " +
+						"https://github.com/BurnsCommaLucas/ready-bot",
 					ephemeral: true
 				})
 			}
-		}, 3000);
+		}, 2000);
 	},
 
 	/**
-	 * Helper function to create a check associated with the given channel & author
-	 * @param {Map<String, Check>} checks
+	 * 
 	 * @param {DISCORD.CommandInteraction} interaction
 	 */
-	async createCheckHandler(checks, interaction) {
-		// var targetUsers = [];
-		// var targetCount;
-
-		// if (m.mentions.users.size > 0 || m.mentions.everyone) {
-		// 	if (!(targetUsers = this.getTargetUsers.call(this, m))) {
-		// 		return;
-		// 	}
-		// }
-
-		var count;
-		try {
-			count = interaction.options.data.filter(opt => opt.name === CON.CHECK.CREATE_NUM_TARGET)[0].value;
-		} catch (error) {
-			console.debug("Failed to parse count for check.");
-		}
-
-		const mentions = interaction.options.resolved.users;// Should this be ".members"?
-
-		// console.log(interaction.channel.members);
-
-		var hasMentions;
-		console.log(mentions);
-		try {
-			hasMentions = !!mentions.length;
-		} catch (error) {
-			console.debug("Failed to check contents of mentions object.");
-		}
-
-		console.log(count, hasMentions);
-
-		if ((count && hasMentions) || (!count && !hasMentions)) {
-			await interaction.reply({
-				content: `Please use either \`/${CON.CHECK.CREATE} ${CON.CHECK.CREATE_MENTION_TARGET}\` or \`/${CON.CHECK.CREATE} ${CON.CHECK.CREATE_NUM_TARGET}\``,
+	async parseMentionCheckHandler(interaction) {
+		// Don't handle @everyone or @here tags so we don't spam people
+		if (interaction.options.data[0].value.indexOf("@everyone") != -1 || interaction.options.data[0].value.indexOf("@here") != -1) {
+			await UTIL.safeRespond(interaction, {
+				content: "Sorry, I can't use global tags like \`everyone\` or \`here\`. Try picking individual users instead.",
 				ephemeral: true
 			});
 			return;
 		}
 
-		await interaction.reply({
-			content: `Creating check for ${count || mentions.toJSON().toString()}`,
-			ephemeral: true
-		});
+		// .members not .users to get server-specific details of the user
+		const resolvedTags = interaction.options.resolved;
 
-		return;
-
-		targetCount = targetCount || parseInt(firstArg);
-		var activeParam;
-		var targetName = "";
-
-		const newCheck = new Check(channel, author);
-
-		if (targetUsers.length > 0) {
-			if (firstArg == CON.HERE || firstArg == CON.EVERY) {
-				targetName = firstArg;
-			}
-			activeParam = targetUsers;
-		}
-		// I use firstArg here instead of targetCount to preserve what the user typed so I can be sassy
-		else if (isNaN(firstArg) || firstArg <= 0) {
-			// No players/count supplied
-			if (firstArg === undefined) {
-				UTIL.errorMsg("How many players do you want to wait for?");
-				return;
-			}
-			// Invalid player/count supplied
-			else {
-				UTIL.errorMsg(`What? You can't have "${firstArg || ''}" player${UTIL.plural(firstArg)} to check.`);
-				return;
-			}
-		}
-		else {
-			activeParam = targetCount;
+		let mentions = [];
+		try {
+			// Have to manually fetch all roles for the guild and cross-reference because the library doesn't 
+			// consider it a bug that the get-members-in-role-mentioned-by-message function doesn't work 
+			const allRoles = await interaction.guild.roles.fetch();
+			mentions.push(
+				...resolvedTags
+					.roles
+					.map(role => Array.from(allRoles.get(role.id).members.values()))
+					.flat()
+					.filter(member => !member.user.bot)
+			);
+		} catch (e) {
+			// Author didn't tag any roles
 		}
 
-		if (Check.prototype.activate.call(newCheck, activeParam, targetName)) {
-			checks[channel.id] = newCheck;
+		try {
+			mentions.push(...resolvedTags.members.filter(member => !member.user.bot).values());
+		} catch (e) {
+			// Author didn't tag any users
 		}
-		else {
-			UTIL.errorMsg(`Sorry ${author}, something went wrong and I couldn't create your check.\n` +
-				`Please type \`${CON.PREFIX}${CON.CHECK_READY_CMD} ${CON.CONTRIBUTE}\` to report this to my maker!\n`)
-			console.error("Failed to create check:");
-			console.error(m);
+
+		if (mentions === undefined || mentions.length === 0) {
+			await UTIL.safeRespond(interaction, {
+				content: `You'll need to select some users to create a \`${CON.CHECK.CREATE_MENTION_TARGET}\` check. Keep in mind I can't wait for bots.\n` +
+					`If you'd like to wait for a number of users rather than specific users, use \`/${CON.CHECK.CREATE} ${CON.CHECK.CREATE_NUM_TARGET}\``,
+				ephemeral: true
+			});
+			return;
 		}
+
+		return mentions
 	},
 
 	/**
-	 * Parse mentions of a message to create a list of users to check. Supports `@here` and `@everyone` tags
-	 * @param {DISCORD.Message} m 
-	 * @returns {DISCORD.User[]}
+	 * Helper function to create a check associated with the given channel & author
+	 * @param {DISCORD.CommandInteraction} interaction
 	 */
-	getTargetUsers: function (m) {
-		var mentionList, targetUsers;
-
-		// Figure out who "everyone" is (covers @everyone and @here), convert to list
-		if (m.mentions.everyone) {
-			mentionList = m.channel.members.map(gm => gm.user);
-		}
-		// Grab the list of user mentions if available, convert to list
-		else {
-			mentionList = m.mentions.users.map(u => u);
+	async parseNumCheckHandler(interaction) {
+		var count;
+		try {
+			count = interaction.options.data.filter(opt => opt.name === CON.CHECK.CREATE_NUM_TARGET)[0].value;
+		} catch (error) {
+			console.debug("Failed to parse count for check.", error);
+			return;
 		}
 
-		// Filter out bots and let the user know if we hit 0 users
-		targetUsers = mentionList.filter(u => !u.bot);
-
-		const filteredUsers = UTIL.leftOuter(mentionList, targetUsers);
-
-		if (filteredUsers.length > 0) {
-			if (targetUsers.length == 0) {
-				return "No users to check, try again with people instead of bots."
-			}
+		if (count < 1) {
+			await UTIL.safeRespond(interaction, {
+				content: "Sorry, I can't wait for fewer than one user to ready up. Try creating your check with a count of 1 or more.",
+				ephemeral: true
+			});
+			return;
 		}
-		return targetUsers;
+
+		return count;
 	}
 }
