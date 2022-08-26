@@ -1,12 +1,12 @@
 module.exports = Object.freeze({
-    CHECK_NUM_CMD: "?",
-    CHECK_READY_CMD: "cready",
-    CONTRIBUTE: "contribute",
-    EVERY: "@everyone",
-    HELP_CMD: "help",
-    HERE: "@here",
-    PREFIX: "!",
-    READY_CMD: "ready",
-    UNREADY_CMD: "unready",
-    USAGE: this.PREFIX + this.CHECK_READY_CMD
+    CHECK: {
+        CREATE: "check",
+        CREATE_MENTION_TARGET: "mentions",
+        CREATE_NUM_TARGET: "count"
+    },
+    STATUS: "who",
+    READY: "ready",
+    UNREADY: "unready",
+    HELP: "help",
+    CONTRIBUTE: "docs"
 });
