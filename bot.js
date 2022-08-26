@@ -1,4 +1,5 @@
 const DISCORD = require('discord.js');
+const { buildConnector } = require('undici');
 const Check = require('./Check.js');
 const CON = require('./constants.js');
 const UTIL = require('./utilities.js');
@@ -12,11 +13,12 @@ module.exports = {
 	async handleMessage(checks, interaction) {
 		var fn;
 		const author = interaction.user;
+		const channelId = interaction.channelId;
 
-		const newCheck = new Check(channelId, author);
+		const newCheck = new Check(author);
 
 		// Get the current check for the current channel if one exists
-		const currentCheck = checks[interaction.channelId];
+		const currentCheck = checks[channelId];
 
 		switch (interaction.commandName) {
 			case (CON.HELP):
@@ -51,9 +53,6 @@ module.exports = {
 
 				if (Check.prototype.isCheckSatisfied.call(currentCheck)) {
 					delete checks[channelId];
-					interaction.channel.send({
-						content: `Ready-check complete, ${Check.prototype.getAuthor.call(currentCheck)}, let's go!`
-					});
 				}
 				return;
 			case (CON.STATUS):
@@ -73,7 +72,7 @@ module.exports = {
 			case (CON.CHECK.CREATE):
 				if (interaction.options.data.length <= 0) {
 					await UTIL.safeRespond(interaction, {
-						content: `You'll need to select either ${CON.CHECK.CREATE_MENTION_TARGET} or ${CON.CHECK.CREATE_NUM_TARGET} to create a check.`,
+						content: `You'll need to select either \`${CON.CHECK.CREATE_MENTION_TARGET}\` or \`${CON.CHECK.CREATE_NUM_TARGET}\` to create a check.`,
 						ephemeral: true
 					});
 					return;
@@ -149,34 +148,26 @@ module.exports = {
 			return;
 		}
 
-		// .members not .users to get server-specific details of the user
+		// This can in theory resolve roles to users, but I've found it very 
+		// picky about when it will/won't pick up a user as part of a role
 		const resolvedTags = interaction.options.resolved;
-
 		let mentions = [];
+
 		try {
-			// Have to manually fetch all roles for the guild and cross-reference because the library doesn't 
-			// consider it a bug that the get-members-in-role-mentioned-by-message function doesn't work 
-			const allRoles = await interaction.guild.roles.fetch();
 			mentions.push(
 				...resolvedTags
-					.roles
-					.map(role => Array.from(allRoles.get(role.id).members.values()))
-					.flat()
-					.filter(member => !member.user.bot)
+					.members
+					.map(member => member.user)
+					.filter(user => !user.bot)
+					.values()
 			);
-		} catch (e) {
-			// Author didn't tag any roles
-		}
-
-		try {
-			mentions.push(...resolvedTags.members.filter(member => !member.user.bot).values());
 		} catch (e) {
 			// Author didn't tag any users
 		}
 
 		if (mentions === undefined || mentions.length === 0) {
 			await UTIL.safeRespond(interaction, {
-				content: `You'll need to select some users to create a \`${CON.CHECK.CREATE_MENTION_TARGET}\` check. Keep in mind I can't wait for bots.\n` +
+				content: `You'll need to select some users to create a \`${CON.CHECK.CREATE_MENTION_TARGET}\` check. Keep in mind I can't wait for bots or roles.\n` +
 					`If you'd like to wait for a number of users rather than specific users, use \`/${CON.CHECK.CREATE} ${CON.CHECK.CREATE_NUM_TARGET}\``,
 				ephemeral: true
 			});
@@ -201,7 +192,8 @@ module.exports = {
 
 		if (count < 1) {
 			await UTIL.safeRespond(interaction, {
-				content: "Sorry, I can't wait for fewer than one user to ready up. Try creating your check with a count of 1 or more.",
+				content: `Sorry, I can only wait for one or more users with a \`${CON.CHECK.CREATE_NUM_TARGET}\` check. Try creating your check with a count of at least 1.\n` +
+					`If you'd like to wait for specifc users rather than a number, use \`/${CON.CHECK.CREATE} ${CON.CHECK.CREATE_MENTION_TARGET}\``,
 				ephemeral: true
 			});
 			return;

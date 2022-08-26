@@ -1,9 +1,10 @@
 const { Client } = require("discord.js");
 const DBL = require("dblapi.js");
+const CON = require("./constants.js");
+const DEPLOY = require("./deploy-commands.js")
 require("dotenv").config();
 
 const BOT = require("./bot.js");
-const CON = require("./constants.js");
 
 const CLIENT = new Client({
 	intents: 2048
@@ -17,7 +18,9 @@ CLIENT.on("ready", () => {
 	// Give some diagnostic info when we log in
 	console.log(`Logged in as ${CLIENT.user.tag}!`);
 
-	CLIENT.user.setActivity("My commands have become slash commands!\n/ready");
+	DEPLOY.deployCommands();
+
+	CLIENT.user.setActivity(`/${CON.CHECK.CREATE}`);
 
 	// Every hour, update top.gg bot server count and log server count
 	setInterval(() => {
@@ -30,7 +33,6 @@ CLIENT.on("ready", () => {
 
 CLIENT.on("interactionCreate", interaction => {
 	if (!interaction.isCommand()) return;
-
 	BOT.handleMessage(checks, interaction);
 });
 

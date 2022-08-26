@@ -44,17 +44,17 @@ const commands = [
     }
 ];
 
-(async () => {
-    try {
-        console.log('Registering slash-commands...');
-
-        await rest.put(
-            Routes.applicationCommands(process.env.BOT_ID),
-            { body: commands }
-        );
-
-        console.log("Success")
-    } catch (error) {
-        console.error(error);
+module.exports = {
+    deployCommands: async function () {
+        try {
+            console.log('Registering slash-commands...');
+            await rest.put(
+                Routes.applicationCommands(process.env.BOT_ID),
+                { body: commands }
+            );
+            console.log("Successfully registered slash commands:", commands);
+        } catch (error) {
+            console.error(error);
+        }
     }
-})();
+}

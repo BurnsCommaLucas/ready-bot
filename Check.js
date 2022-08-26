@@ -127,8 +127,12 @@ class Check {
 		this.readiedUsers.push(user);
 		this.readiedCount = this.readiedUsers.length;
 
+		let msg = `${user} is ready! ${this.countRemaining()} user${UTIL.plural(this.countRemaining())} left.`;
+
+		if (this.isCheckSatisfied()) msg += `\n\nCheck complete, let's go, ${this.author}!`;
+
 		await UTIL.safeRespond(interaction, {
-			content: `${user} is ready! ${this.countRemaining()} user${UTIL.plural(this.countRemaining())} left.`
+			content: msg
 		});
 	}
 

@@ -49,7 +49,7 @@ module.exports = {
      * @param {DISCORD.GuildMember[]} users 
      */
     whoToReady: function (users) {
-        var out = users.map(member => member.user).join(", ");
+        var out = users.join(", ");
         return out;
     }
 }
