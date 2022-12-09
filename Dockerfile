@@ -2,6 +2,8 @@ FROM node:16.18 as build-stage
 
 COPY . .
 
+RUN yarn install
+
 ARG BOT_TOKEN
 ENV BOT_TOKEN=${BOT_TOKEN}
 
