@@ -1,7 +1,7 @@
 version: '3.7'
 services:
   ready-bot:
-    container_name: ready-bot
+    container_name: ready-bot-${BOT_ENV}
     build:
       context: .
       dockerfile: Dockerfile
