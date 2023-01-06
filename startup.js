@@ -26,7 +26,6 @@ CLIENT.on("ready", () => {
 	setInterval(() => {
 		if (!DBL_TOKEN) return;
 		const serverCount = CLIENT.guilds.cache.size;
-		console.log(`Server count = ${serverCount}`);
 		DBL_API.postStats(serverCount);
 	}, 60000);
 });
