@@ -23,21 +23,18 @@ CLIENT.on("ready", () => {
 	CLIENT.user.setActivity(`/${CON.CHECK.CREATE}`);
 
 	// Every hour, update top.gg bot server count and log server count
-	setInterval(() => {
-		if (!DBL_TOKEN) return;
-		const serverCount = CLIENT.guilds.cache.size;
-		DBL_API.postStats(serverCount);
-	}, 60000);
+	// ! Come back for this later, DBL broke this version so I'll need to update to @top-gg/sdk
+	// setInterval(() => {
+	// 	if (!DBL_TOKEN) return;
+	// 	const serverCount = CLIENT.guilds.cache.size;
+	// 	console.log(`Server count = ${serverCount}`);
+	// 	DBL_API.postStats(serverCount);
+	// }, 60000);
 });
 
 CLIENT.on("interactionCreate", interaction => {
 	if (!interaction.isCommand()) return;
-	try {
-		BOT.handleMessage(checks, interaction);
-	} catch (error) {
-		console.error("Encountered unknown error state:")
-		console.error(error);
-	}
+	BOT.handleMessage(checks, interaction);
 });
 
 // Hook up to discord
