@@ -32,7 +32,12 @@ CLIENT.on("ready", () => {
 
 CLIENT.on("interactionCreate", interaction => {
 	if (!interaction.isCommand()) return;
-	BOT.handleMessage(checks, interaction);
+	try {
+		BOT.handleMessage(checks, interaction);
+	} catch (error) {
+		console.error("Encountered unknown error state:")
+		console.error(error);
+	}
 });
 
 // Hook up to discord
