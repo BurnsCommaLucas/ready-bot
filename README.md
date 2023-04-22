@@ -2,13 +2,8 @@
 [![Discord Bots](https://top.gg/api/widget/status/389210640612589568.svg)](https://top.gg/bot/389210640612589568)
 [![Discord Bots](https://top.gg/api/widget/servers/389210640612589568.svg)](https://top.gg/bot/389210640612589568)
 
-## Important Update:
-
-This version of ready-bot will be retired [Saturday, April 22nd 2023 around 1:00 pm PDT](https://time.is/compare/0100PM_22_Apr_2023_in_PDT) and replaced with a new, functionally 
-identical version. There will likely be some intermittent outages for an hour or two at that time as I work to stand up and verify the new bot. For more details on this update, 
-you can read [the FAQ section in the new repo](https://github.com/BurnsCommaLucas/ready-botlin/#faq) or start a discussion in the support server linked below if you have questions.
-
----
+## THIS IS THE LEGACY VERSION OF READY-BOT
+As of April 22, 2023, this version of the bot has been replaced by the new version of the bot available [here](https://github.com/BurnsCommaLucas/ready-botlin). The bot still does the same thing, but all bug reports, suggestions, etc should be taken to the [new repo](https://github.com/BurnsCommaLucas/ready-botlin)
 
 A WoW style ready-check bot for [Discord](https://discordapp.com) servers. Built and deployed automatically through [Heroku](https://heroku.com).
 
